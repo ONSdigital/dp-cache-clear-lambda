@@ -1,8 +1,5 @@
 Change log
 ==========
 
-0.2.0 (2016-10-24)
-- Another example changelog entry
-
-0.1.0 (2016-10-20)
-- Example changelog entry
+1.0.0 (2017-10-18)
+- Lambda function which clears CloudFlare cache and notifies Slack

@@ -1,30 +1,21 @@
-dp-repo-template
-================
+dp-cache-clear-lambda
+=====================
 
-A template git repository for DP repos:
-
-* Standardised files for CHANGELOG, CONTRIBUTING, LICENSE and README
-* Default template for GitHub pull requests
+An AWS lambda function which clears the CloudFlare cache and sends a notification to Slack.
 
 ### Getting started
 
-After creating a new repository on GitHub, use these commands to initialise
-it using this repository as a template:
-
-* `git clone git@github.com:ONSdigital/dp-repo-template dp-new-repo-name`
-* `cd dp-new-repo-name`
-* `git remote set-url origin git@github.com:ONSdigital/dp-new-repo-name`
-
-Remember to update the [README](README.md) and [CHANGELOG](CHANGELOG.md) files.
+* Deploy lambda function to AWS
+* Setup CloudWatch event to trigger the function on a timer
 
 ### Configuration
 
-An overview of the configuration options available, either as a table of
-environment variables, or with a link to a configuration guide.
-
 | Environment variable | Default | Description
 | -------------------- | ------- | -----------
-| BIND_ADDR            | :8080   | The host and port to bind to
+| CF_ZONE              |         | The CloudFlare zone ID
+| CF_TOKEN             |         | The CloudFlare API token
+| CF_EMAIL             |         | The CloudFlare account email address
+| SLACK_TOKEN          |         | A Slack bot user token
 
 ### Contributing
 
