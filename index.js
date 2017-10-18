@@ -18,7 +18,8 @@ exports.handler = (event, context, callback) => {
         }
     };
     
-    const slack_payload = "token=" + process.env.SLACK_TOKEN + "&as_user=true&channel=#support&text=The cache has been cleared automatically.";
+    const slack_payload_ok = "token=" + process.env.SLACK_TOKEN + "&as_user=true&channel=#support&text=The cache has been cleared automatically.";
+    const slack_payload_err = "token=" + process.env.SLACK_TOKEN + "&as_user=true&channel=#support&text=An error occurred while automatically clearing the cache: ";
     const slack_options = {
         host: 'slack.com',
         path: '/api/chat.postMessage',
@@ -31,7 +32,14 @@ exports.handler = (event, context, callback) => {
     
     var request = https.request(cloudflare_options, (res) => {
         console.log('cloudflare statusCode: ', res.statusCode);
-        var slack_request = https.request(slack_options, (res) => {
+
+        let payload = slack_payload_ok;
+        if(res.statusCode != 200) {
+            payload = slack_payload_err;
+        }
+
+        // Send a notification to Slack
+        const slack_request = https.request(slack_options, (res) => {
             console.log('slack statusCode: ', res.statusCode);
             res.on('data', (d) => {
                 console.log(new Buffer(d).toString('ascii'));
@@ -40,12 +48,26 @@ exports.handler = (event, context, callback) => {
         slack_request.on('error', (e) => {
             callback(e, null);
         })
-        slack_request.write(slack_payload);
+        slack_request.write(payload);
         slack_request.end();
     });
     
     request.on('error', (e) => {
-       callback(e, null);
+        // Send a error notification to Slack
+        const slack_request = https.request(slack_options, (res) => {
+            console.log('slack statusCode: ', res.statusCode);
+            res.on('data', (d) => {
+                console.log(new Buffer(d).toString('ascii'));
+            })
+        });
+        slack_request.on('error', (e) => {
+            callback(e, null);
+        })
+        slack_request.write(slack_payload_err + e);
+        slack_request.end();
+
+        // Return the CloudFlare error
+        callback(e, null);
     });
     
     request.write(cloudflare_payload);
